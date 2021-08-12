@@ -3,6 +3,7 @@ import com.revature.projectzero.repositories.CourseRepository;
 import com.revature.projectzero.repositories.UserCoursesRepository;
 import com.revature.projectzero.repositories.UserRepository;
 import com.revature.projectzero.services.CourseService;
+import com.revature.projectzero.services.InputValidatorService;
 import com.revature.projectzero.services.UserCoursesService;
 import com.revature.projectzero.services.UserService;
 import com.revature.projectzero.screens.*;
@@ -31,16 +32,16 @@ public class AppState {
 
         // Dependencies for injection
         BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
-        InputValidator inputValidator = new InputValidator();
+        InputValidatorService inputValidatorService = new InputValidatorService();
 
 
         // Create app components and dependencies
         UserSession userSession = new UserSession();
         UserRepository userRepo = new UserRepository();
-        UserService userService = new UserService(userRepo, userSession, inputValidator);
+        UserService userService = new UserService(userRepo, userSession, inputValidatorService);
 
         CourseRepository courseRepo = new CourseRepository();
-        CourseService courseService = new CourseService(courseRepo, inputValidator);
+        CourseService courseService = new CourseService(courseRepo, inputValidatorService);
 
         UserCoursesRepository courseListRepo = new UserCoursesRepository();
         UserCoursesService userCoursesService = new UserCoursesService(courseListRepo, userSession);

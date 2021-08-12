@@ -1,6 +1,5 @@
 package com.revature.projectzero.services;
 
-import com.revature.projectzero.util.InputValidator;
 import com.revature.projectzero.util.exceptions.*;
 import com.revature.projectzero.documents.Course;
 import com.revature.projectzero.repositories.CourseRepository;
@@ -10,16 +9,16 @@ import java.util.List;
 public class CourseService {
 
     private final CourseRepository courseRepo;
-    private final InputValidator inputValidator;
+    private final InputValidatorService inputValidatorService;
 
-    public CourseService(CourseRepository courseRepo, InputValidator inputValidator) {
+    public CourseService(CourseRepository courseRepo, InputValidatorService inputValidatorService) {
         this.courseRepo = courseRepo;
-        this.inputValidator = inputValidator;
+        this.inputValidatorService = inputValidatorService;
     }
 
     public Course add(Course newCourse) {
 
-        inputValidator.newCourseEntryValidator(newCourse);
+        inputValidatorService.newCourseEntryValidator(newCourse);
 
         if (courseRepo.findCourseByName(newCourse.getCourseName()) != null)
         {
@@ -45,7 +44,7 @@ public class CourseService {
     public void updateCourseName(Course editingCourse, String newName){
 
 
-        inputValidator.newCourseNameValidator(editingCourse, newName);
+        inputValidatorService.newCourseNameValidator(editingCourse, newName);
 
         if (courseRepo.findCourseByName(newName) != null)
         {
@@ -58,7 +57,7 @@ public class CourseService {
     }
     public void updateCourseAbv(Course editingCourse, String newAbv){
 
-        inputValidator.newCourseAbvValidator(editingCourse, newAbv);
+        inputValidatorService.newCourseAbvValidator(editingCourse, newAbv);
 
         if (courseRepo.findCourseByAbbreviation(newAbv) != null)
         {
@@ -71,7 +70,7 @@ public class CourseService {
     }
     public void updateCourseDesc(Course editingCourse, String newDesc){
 
-        inputValidator.newCourseDetailsValidator(newDesc);
+        inputValidatorService.newCourseDetailsValidator(newDesc);
 
         courseRepo.updatingCourseDesc(editingCourse, newDesc);
 

@@ -1,20 +1,20 @@
-package com.revature.projectzero.util;
+package com.revature.projectzero.services;
 
 import com.revature.projectzero.documents.AppUser;
 import com.revature.projectzero.documents.Course;
+import com.revature.projectzero.services.InputValidatorService;
 import com.revature.projectzero.util.exceptions.*;
 
 import org.junit.*;
-import org.omg.CORBA.DynAnyPackage.Invalid;
 
 
-public class InputValidatorTestSuite {
+public class InputValidatorServiceTestSuite {
 
-    private InputValidator sut;
+    private InputValidatorService sut;
 
     @Before
     public void setup(){
-        sut = new InputValidator();
+        sut = new InputValidatorService();
     }
 
     @After

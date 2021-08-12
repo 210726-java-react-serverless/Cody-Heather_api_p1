@@ -1,4 +1,4 @@
-package com.revature.projectzero.util;
+package com.revature.projectzero.services;
 
 import com.revature.projectzero.documents.AppUser;
 import com.revature.projectzero.documents.Course;
@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  *
  */
 
-public class InputValidator {
+public class InputValidatorService {
 
     // User restrictions are defined here.
     private static final int MIN_USERNAME = 4;

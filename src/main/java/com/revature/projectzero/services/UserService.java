@@ -1,6 +1,5 @@
 package com.revature.projectzero.services;
 
-import com.revature.projectzero.util.InputValidator;
 import com.revature.projectzero.util.UserSession;
 import com.revature.projectzero.util.exceptions.AuthenticationException;
 import com.revature.projectzero.documents.AppUser;
@@ -13,20 +12,20 @@ public class UserService {
 
     private final UserRepository userRepo;
     private final UserSession session;
-    private final InputValidator inputValidator;
+    private final InputValidatorService inputValidatorService;
 
     // Injecting Dependencies
-    public UserService(UserRepository userRepo, UserSession session, InputValidator inputValidator) {
+    public UserService(UserRepository userRepo, UserSession session, InputValidatorService inputValidatorService) {
         this.userRepo = userRepo;
         this.session = session;
-        this.inputValidator = inputValidator;
+        this.inputValidatorService = inputValidatorService;
     }
 
     // Register a new user
     public AppUser register(AppUser newUser) {
 
         // Throws exception if entry is invalid
-        inputValidator.newUserEntryValidator(newUser);
+        inputValidatorService.newUserEntryValidator(newUser);
 
         if (userRepo.findUserByUsername(newUser.getUsername()) != null)
         {
