@@ -1,9 +1,17 @@
 package com.revature.ncu.services;
 
 import com.revature.ncu.datasources.documents.AppUser;
+import com.revature.ncu.datasources.documents.Course;
 import com.revature.ncu.datasources.documents.UserCourses;
+import com.revature.ncu.datasources.repositories.CourseRepository;
 import com.revature.ncu.datasources.repositories.UserCoursesRepository;
+import com.revature.ncu.util.exceptions.AlreadyRegisteredForCourseException;
+import com.revature.ncu.util.exceptions.CourseNotOpenException;
 import com.revature.ncu.util.exceptions.NotRegisteredForCourseException;
+import com.revature.ncu.web.dtos.Principal;
+import com.revature.ncu.web.util.ContextLoaderListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -12,10 +20,17 @@ import java.util.List;
 public class UserCoursesService {
 
     private final UserCoursesRepository userCourseListRepo;
+    private final CourseValidatorService courseValidatorService;
+    private final CourseRepository courseRepository;
+
+    private final Logger logger = LoggerFactory.getLogger(UserCoursesService.class);
 
 
-    public UserCoursesService(UserCoursesRepository userCourseRepo) {
+
+    public UserCoursesService(UserCoursesRepository userCourseRepo, CourseValidatorService cVS, CourseRepository courseRepo) {
         this.userCourseListRepo = userCourseRepo;
+        this.courseValidatorService = cVS;
+        this.courseRepository = courseRepo;
 
     }
 
@@ -24,8 +39,24 @@ public class UserCoursesService {
     }
 
     // Checks to see if the user has already joined a course, passes the course requested and the username to the Repo if not
-    public void joinCourse(String courseToJoin){
+    public void joinCourse(Course joiningCourse, Principal principal){
 
+        // Making sure course is open
+        if(!courseValidatorService.isOpen(joiningCourse)) {
+            logger.info("User tried to register for course that was closed");
+            throw new CourseNotOpenException("Course is closed!");
+        }
+
+        // Making sure user is not already registered
+        for(String id : joiningCourse.getStudentIds()) {
+            if(id.equals(principal.getId())) {
+                logger.info("User tried to join a course they were already registered for");
+                throw new AlreadyRegisteredForCourseException("User already registered for this course!");
+            }
+        }
+
+        userCourseListRepo.joinCourse(joiningCourse.getCourseName(),principal.getUsername());
+        courseRepository.addStudentID(joiningCourse, principal.getId());
     }
 
 

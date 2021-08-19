@@ -154,4 +154,11 @@ public class CourseValidatorService {
         }
         return true;
     }
+
+    // Returns true if within registration window and course is not full.
+    public boolean isOpen(Course course){
+        return course.getCourseOpenDate().isAfter(LocalDate.now())
+                && course.getCourseCloseDate().isBefore(LocalDate.now())
+                && course.getSlotsTaken() < course.getCourseCapacity();
+    }
 }

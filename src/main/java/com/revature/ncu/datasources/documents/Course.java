@@ -66,8 +66,6 @@ public class Course {
         this.slotsTaken = slots;
     }
 
-
-
     // Setters and getters
     public String getCourseName() {
         return courseName;

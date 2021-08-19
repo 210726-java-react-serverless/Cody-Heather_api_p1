@@ -5,11 +5,13 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoClient;
+import com.revature.ncu.datasources.repositories.CourseRepository;
+import com.revature.ncu.datasources.repositories.UserCoursesRepository;
 import com.revature.ncu.datasources.repositories.UserRepository;
 import com.revature.ncu.datasources.utils.MongoClientFactory;
-import com.revature.ncu.services.UserValidatorService;
-import com.revature.ncu.services.UserService;
+import com.revature.ncu.services.*;
 import com.revature.ncu.util.PasswordUtils;
+import com.revature.ncu.web.dtos.Principal;
 import com.revature.ncu.web.servlets.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,11 +30,18 @@ public class ContextLoaderListener implements ServletContextListener {
         MongoClient mongoClient = MongoClientFactory.getInstance().getConnection();
         PasswordUtils passwordUtils = new PasswordUtils();
         UserValidatorService userValidatorService = new UserValidatorService();
+        CourseValidatorService courseValidatorService = new CourseValidatorService();
 
         ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 
         UserRepository userRepo = new UserRepository(mongoClient);
         UserService userService = new UserService(userRepo, userValidatorService, passwordUtils);
+
+        CourseRepository courseRepository = new CourseRepository(mongoClient);
+        CourseService courseService = new CourseService(courseRepository, courseValidatorService);
+
+        UserCoursesRepository userCoursesRepository = new UserCoursesRepository(mongoClient);
+        UserCoursesService userCoursesService = new UserCoursesService(userCoursesRepository, courseValidatorService, courseRepository);
 
         UserServlet userServlet = new UserServlet(userService, mapper);
         AuthServlet authServlet = new AuthServlet(userService, mapper);

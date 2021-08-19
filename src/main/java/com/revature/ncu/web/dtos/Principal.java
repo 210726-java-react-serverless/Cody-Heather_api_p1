@@ -8,6 +8,7 @@ public class Principal {
 
     private String id;
     private String username;
+    private boolean faculty;
 
     public Principal() {
         super();
@@ -16,6 +17,7 @@ public class Principal {
     public Principal(AppUser subject) {
         this.id = subject.getId();
         this.username = subject.getUsername();
+        this.faculty = subject.isFaculty();
     }
 
     public String getId() {
@@ -32,6 +34,14 @@ public class Principal {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public boolean isFaculty() {
+        return faculty;
+    }
+
+    public void setFaculty(boolean faculty) {
+        this.faculty = faculty;
     }
 
     @Override
