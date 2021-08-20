@@ -2,14 +2,18 @@ package com.revature.ncu.datasources.repositories;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import com.revature.ncu.datasources.documents.Course;
 import com.revature.ncu.util.exceptions.DataSourceException;
+import com.revature.ncu.util.exceptions.NoOpenCoursesException;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,63 +48,72 @@ public class CourseRepository implements CrudRepository<Course> {
         }
     }
 
-    // TODO pull a list of courses where openDate is before currentDate and closeDate is after currentDate
-    public List<Course> retrieveOpenCourses() {
-            return null;
-    }
-
-
-    // TODO method for updating all values at once
     public Course updateCourse(Course originalCourse,Course updatedCourse){
+
+        try{
+            // Professor name will automatically be set by grabbing the Facultyuser's FN/LN when a course is created
+            coursesCollection.updateOne(Filters.eq("_id", originalCourse.getId()), Updates.combine(
+                    Updates.set("courseName", updatedCourse.getCourseName()),
+                    Updates.set("courseAbbreviation", updatedCourse.getCourseAbbreviation()),
+                    Updates.set("courseDetail", updatedCourse.getCourseDetail()),
+                    Updates.set("courseOpenDate", updatedCourse.getCourseOpenDate()),
+                    Updates.set("courseCloseDate", updatedCourse.getCourseCloseDate()),
+                    Updates.set("courseCapacity", updatedCourse.getCourseCapacity())));
+
+            return updatedCourse;
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return null;
     }
 
-    public void updatingCourseName(Course original,String newName){
-        try {
-            // Append $set to "courseName" : newName
-            Document updateDoc = new Document("courseName", newName);
-            Document appendDoc = new Document("$set",updateDoc);
-            // Search for "courseName" : original courseName
-            Document searchDoc = new Document("courseName",original.getCourseName());
-            // Update course name
-            coursesCollection.updateOne(searchDoc,appendDoc);
-        } catch (Exception e) {
-            logger.error("An unexpected exception occurred.", e);
-            throw new DataSourceException(e);
-        }
-
-    }
-
-    public void updatingCourseAbv(Course original, String newAbv){
-        try {
-            Document updateDoc = new Document("courseAbbreviation", newAbv);
-            Document appendDoc = new Document("$set",updateDoc);
-            Document searchDoc = new Document("courseAbbreviation", original.getCourseAbbreviation());
-
-            coursesCollection.updateOne(searchDoc,appendDoc);
-
-        } catch (Exception e) {
-            logger.error("An unexpected exception occurred.", e);
-            throw new DataSourceException(e);
-        }
-
-    }
-
-    public void updatingCourseDesc(Course original, String newDesc){
-        try {
-            Document updateDoc = new Document("courseDetail", newDesc);
-            Document appendDoc = new Document("$set",updateDoc);
-            Document searchDoc = new Document("courseAbbreviation",original.getCourseAbbreviation());
-
-            coursesCollection.updateOne(searchDoc,appendDoc);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("An unexpected exception occurred.", e);
-            throw new DataSourceException(e);
-        }
-
-    }
+//    public void updatingCourseName(Course original,String newName){
+//        try {
+//            // Append $set to "courseName" : newName
+//            Document updateDoc = new Document("courseName", newName);
+//            Document appendDoc = new Document("$set",updateDoc);
+//            // Search for "courseName" : original courseName
+//            Document searchDoc = new Document("courseName",original.getCourseName());
+//            // Update course name
+//            coursesCollection.updateOne(searchDoc,appendDoc);
+//        } catch (Exception e) {
+//            logger.error("An unexpected exception occurred.", e);
+//            throw new DataSourceException(e);
+//        }
+//
+//    }
+//
+//    public void updatingCourseAbv(Course original, String newAbv){
+//        try {
+//            Document updateDoc = new Document("courseAbbreviation", newAbv);
+//            Document appendDoc = new Document("$set",updateDoc);
+//            Document searchDoc = new Document("courseAbbreviation", original.getCourseAbbreviation());
+//
+//            coursesCollection.updateOne(searchDoc,appendDoc);
+//
+//        } catch (Exception e) {
+//            logger.error("An unexpected exception occurred.", e);
+//            throw new DataSourceException(e);
+//        }
+//
+//    }
+//
+//    public void updatingCourseDesc(Course original, String newDesc){
+//        try {
+//            Document updateDoc = new Document("courseDetail", newDesc);
+//            Document appendDoc = new Document("$set",updateDoc);
+//            Document searchDoc = new Document("courseAbbreviation",original.getCourseAbbreviation());
+//
+//            coursesCollection.updateOne(searchDoc,appendDoc);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            logger.error("An unexpected exception occurred.", e);
+//            throw new DataSourceException(e);
+//        }
+//
+//    }
 
 
     // Remove a course from the database
@@ -126,6 +139,7 @@ public class CourseRepository implements CrudRepository<Course> {
             Document appendDoc = new Document("$push",updateDoc);
             coursesCollection.updateOne(searchDoc,appendDoc);
 
+            // Send $inc command to add 1 to slotsTaken on database.
             Document slotsDoc = new Document("slotsTaken", 1);
             Document incDoc = new Document("$inc",slotsDoc);
             coursesCollection.updateOne(searchDoc,incDoc);
@@ -135,6 +149,30 @@ public class CourseRepository implements CrudRepository<Course> {
             throw new DataSourceException(e);
         }
 
+
+    }
+
+    public List<Course> retrieveOpenCourses() {
+
+        List<Course> openCourses = new ArrayList<>();
+        try{
+            coursesCollection.find().into(openCourses);// db.courses.find({})
+
+            openCourses.removeIf(a -> a.getCourseOpenDate().isAfter(LocalDate.now())
+                    || a.getCourseCloseDate().isBefore(LocalDate.now()));
+
+            if(openCourses.isEmpty())
+            {
+                logger.info("hey make some open courses first geez");
+                throw new NoOpenCoursesException("There are no Courses open...:(");
+            }
+
+            return openCourses;
+
+        }catch(Exception e){
+            logger.error("An unexpected exception occurred.", e);
+            throw new DataSourceException(e);
+        }
 
     }
 

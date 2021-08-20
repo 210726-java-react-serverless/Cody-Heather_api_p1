@@ -12,22 +12,22 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class FacultyServlet extends HttpServlet {
-    private final Logger logger = LoggerFactory.getLogger(CourseServlet.class);
+    private final Logger logger = LoggerFactory.getLogger(FacultyServlet.class);
 
-    public FacultyServlet facultyServlet = new FacultyServlet(){
-    };
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-        System.out.println(req.getAttribute("filtered"));
-        PrintWriter respWriter = resp.getWriter();
-        resp.setContentType("application/json");
-
-        try {
-            //  HttpSession session = req.getSession().invalidate();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException
+    {
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        out.println("<html>");
+        out.println("<head>");
+        out.println("<title>Faculty Dashboard</title>");
+        out.println("</head>");
+        out.println("<body>");
+        out.println("<h1>This will be the faculty dashboard!</h1>");
+        out.println("</body>");
+        out.println("</html>");
     }
 }

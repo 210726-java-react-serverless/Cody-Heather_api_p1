@@ -95,70 +95,131 @@ public class CourseValidatorService {
 
     // Validator for Editing Course Values
 
-    public boolean newCourseNameValidator(Course original, String newName){
-
-        if(newName.trim().equals(""))
-        {
-            System.out.println("Fields cannot be blank!");
-            throw new InvalidEntryException("Blank fields detected.");
-        }
-        else if(newName.length() > MAX_COURSE_NAME)
-        {
-            System.out.printf("Please keep course name concise and under %d characters.%n", MAX_COURSE_NAME);
-            throw new InvalidCourseNameException("Course name too long.");
-        }
-        else if(newName.length() < original.getCourseAbbreviation().length())
-        {
-            System.out.println("Please make your course name longer than the abbreviation.");
-            throw new InvalidCourseNameException("Course name too short.");
-        }
-        return true;
-    }
-
-    public boolean newCourseAbvValidator(Course original, String newAbv){
-        if(newAbv.trim().equals(""))
-        {
-            System.out.println("Fields cannot be blank!");
-            throw new InvalidEntryException("Blank fields detected.");
-        }
-        else if(newAbv.length() > MAX_COURSE_ABV)
-        {
-            System.out.printf("Please keep the course Abbreviation to %d characters or less.%n", MAX_COURSE_ABV);
-            throw new InvalidCourseAbbreviationException("Course Abbreviation too long.");
-        }else if(newAbv.length() > original.getCourseName().length())
-        {
-            System.out.println("Please make your new Abbreviation shorter than the course name.");
-            throw new InvalidCourseAbbreviationException("Course abbreviation too long.");
-        }
-        return true;
-    }
-
-    public boolean newCourseDetailsValidator(String newDetails){
-
-        if(newDetails.trim().equals(""))
-        {
-            System.out.println("Fields cannot be blank!");
-            throw new InvalidEntryException("Blank fields detected.");
-        }
-        else if(newDetails.length() < MIN_COURSE_DESC)
-        {
-            System.out.printf("Course description must be at least %d characters long.%nPlease provide more details about the course.%n"
-                    , MIN_COURSE_DESC);
-            throw new InvalidCourseDescriptionException("Course description too short.");
-        }
-        else if(newDetails.length() > MAX_COURSE_DESC)
-        {
-            System.out.printf("Course description is too long.%nPlease enter a more concise description under %d characters."
-                    , MAX_COURSE_DESC);
-            throw new InvalidCourseDescriptionException("Course description too long.");
-        }
-        return true;
-    }
+//    public boolean newCourseNameValidator(Course original, String newName){
+//
+//        if(newName.trim().equals(""))
+//        {
+//            System.out.println("Fields cannot be blank!");
+//            throw new InvalidEntryException("Blank fields detected.");
+//        }
+//        else if(newName.length() > MAX_COURSE_NAME)
+//        {
+//            System.out.printf("Please keep course name concise and under %d characters.%n", MAX_COURSE_NAME);
+//            throw new InvalidCourseNameException("Course name too long.");
+//        }
+//        else if(newName.length() < original.getCourseAbbreviation().length())
+//        {
+//            System.out.println("Please make your course name longer than the abbreviation.");
+//            throw new InvalidCourseNameException("Course name too short.");
+//        }
+//        return true;
+//    }
+//
+//    public boolean newCourseAbvValidator(Course original, String newAbv){
+//        if(newAbv.trim().equals(""))
+//        {
+//            System.out.println("Fields cannot be blank!");
+//            throw new InvalidEntryException("Blank fields detected.");
+//        }
+//        else if(newAbv.length() > MAX_COURSE_ABV)
+//        {
+//            System.out.printf("Please keep the course Abbreviation to %d characters or less.%n", MAX_COURSE_ABV);
+//            throw new InvalidCourseAbbreviationException("Course Abbreviation too long.");
+//        }else if(newAbv.length() > original.getCourseName().length())
+//        {
+//            System.out.println("Please make your new Abbreviation shorter than the course name.");
+//            throw new InvalidCourseAbbreviationException("Course abbreviation too long.");
+//        }
+//        return true;
+//    }
+//
+//    public boolean newCourseDetailsValidator(String newDetails){
+//
+//        if(newDetails.trim().equals(""))
+//        {
+//            System.out.println("Fields cannot be blank!");
+//            throw new InvalidEntryException("Blank fields detected.");
+//        }
+//        else if(newDetails.length() < MIN_COURSE_DESC)
+//        {
+//            System.out.printf("Course description must be at least %d characters long.%nPlease provide more details about the course.%n"
+//                    , MIN_COURSE_DESC);
+//            throw new InvalidCourseDescriptionException("Course description too short.");
+//        }
+//        else if(newDetails.length() > MAX_COURSE_DESC)
+//        {
+//            System.out.printf("Course description is too long.%nPlease enter a more concise description under %d characters."
+//                    , MAX_COURSE_DESC);
+//            throw new InvalidCourseDescriptionException("Course description too long.");
+//        }
+//        return true;
+//    }
 
     // Returns true if within registration window and course is not full.
     public boolean isOpen(Course course){
         return course.getCourseOpenDate().isAfter(LocalDate.now())
                 && course.getCourseCloseDate().isBefore(LocalDate.now())
                 && course.getSlotsTaken() < course.getCourseCapacity();
+    }
+
+    public boolean courseUpdateValidator(Course original, Course updatingCourse) {
+        if(updatingCourse.getCourseName().trim().equals("")||updatingCourse.getCourseAbbreviation().trim().equals("")||updatingCourse.getCourseDetail().trim().equals(""))
+        {
+            logger.error("Fields cannot be blank!");
+            throw new InvalidEntryException("Blank fields detected.");
+        }
+        else if(updatingCourse.getCourseName().length() > MAX_COURSE_NAME)
+        {
+            logger.error("Course name over {} characters provided.", MAX_COURSE_NAME);
+            throw new InvalidCourseNameException("Course name too long.");
+        }
+        else if(updatingCourse.getCourseName().length() < updatingCourse.getCourseAbbreviation().length())
+        {
+            logger.error("Course name shorter than abbreviation provided.");
+            throw new InvalidCourseNameException("Course name too short.");
+        }
+        else if(updatingCourse.getCourseAbbreviation().length() > MAX_COURSE_ABV)
+        {
+            logger.error("Course abbreviation over {} characters provided.", MAX_COURSE_ABV);
+            throw new InvalidCourseAbbreviationException("Course Abbreviation too long.");
+        }
+        else if(updatingCourse.getCourseDetail().length() < MIN_COURSE_DESC)
+        {
+            logger.error("Course description under {} characters provided."
+                    , MIN_COURSE_DESC);
+            throw new InvalidCourseDescriptionException("Course description too short.");
+        }
+        else if(updatingCourse.getCourseDetail().length() > MAX_COURSE_DESC)
+        {
+
+            logger.error("Course description over {} characters provided.", MAX_COURSE_DESC);
+            throw new InvalidCourseDescriptionException("Course description too long.");
+        }
+        else if(updatingCourse.getCourseCapacity()<=original.getSlotsTaken()){
+            logger.error("Invalid capacity provided ({}) cannot be less than enrolled students({})!",
+                    updatingCourse.getCourseCapacity(),original.getSlotsTaken());
+            throw new InvalidCourseCapacityException("Cannot reduce capacity below current enrollment.");
+        }
+        else if(updatingCourse.getCourseCapacity()<MIN_COURSE_CAP)
+        {
+            logger.error("Course capacity under {} provided.", MIN_COURSE_CAP);
+            throw new InvalidCourseCapacityException("Course capacity too low.");
+        }
+        else if(updatingCourse.getCourseCapacity()>MAX_COURSE_CAP)
+        {
+            logger.error("Course capacity over {} provided.", MAX_COURSE_CAP);
+            throw new InvalidCourseCapacityException("Course capacity too high.");
+        }
+        else if(updatingCourse.getCourseOpenDate().isAfter(updatingCourse.getCourseCloseDate()))
+        {
+            logger.error("Provided course open date is after course close date.");
+            throw new InvalidCourseDateException("Course open date after course close date.");
+        }
+        else if(updatingCourse.getCourseOpenDate().isBefore(LocalDate.now()))
+        {
+            logger.error("Provided course open date is before today.");
+            throw new InvalidCourseDateException("Course open date before current date.");
+        }
+        return false;
     }
 }

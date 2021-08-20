@@ -38,12 +38,11 @@ public class Course {
     }
 
     // For creating a new course.
-    public Course(String cn, String cAbv, String detail, String prof,
+    public Course(String cn, String cAbv, String detail,
                   LocalDate openDate, LocalDate closeDate, int cap){
         this.courseName = cn;
         this.courseAbbreviation = cAbv;
         this.courseDetail = detail;
-        this.professorName = prof;
         this.courseOpenDate = openDate;
         this.courseCloseDate = closeDate;
         this.courseCapacity = cap;

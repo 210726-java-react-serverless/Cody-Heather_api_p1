@@ -17,6 +17,7 @@ public class CourseService {
     }
 
     // For faculty creating a new course
+    // TODO: Grab professor's first name and last name and .setProfessorName(fn+ln) in the CourseServlet;
     public Course add(Course newCourse) {
 
         // Verify that the course data is valid.
@@ -45,40 +46,48 @@ public class CourseService {
 
     }
 
-    public void updateCourseName(Course editingCourse, String newName){
+    public Course updateCourse(Course original, Course update){
 
+        courseValidatorService.courseUpdateValidator(original, update);
 
-        courseValidatorService.newCourseNameValidator(editingCourse, newName);
-
-        if (courseRepo.findCourseByName(newName) != null)
-        {
-            System.out.println("A course by that name already exists!");
-            throw new ResourcePersistenceException("User provided a course name that already exists.");
-        }
-
-        courseRepo.updatingCourseName(editingCourse, newName);
-
+        courseRepo.updateCourse(original,update);
+        return update;
     }
-    public void updateCourseAbv(Course editingCourse, String newAbv){
 
-        courseValidatorService.newCourseAbvValidator(editingCourse, newAbv);
-
-        if (courseRepo.findCourseByAbbreviation(newAbv) != null)
-        {
-            System.out.println("A course with that abbreviation already exists!");
-            throw new ResourcePersistenceException("User provided an abbreviation that already exists.");
-        }
-
-        courseRepo.updatingCourseAbv(editingCourse, newAbv);
-
-    }
-    public void updateCourseDesc(Course editingCourse, String newDesc){
-
-        courseValidatorService.newCourseDetailsValidator(newDesc);
-
-        courseRepo.updatingCourseDesc(editingCourse, newDesc);
-
-    }
+//    public void updateCourseName(Course editingCourse, String newName){
+//
+//
+//        courseValidatorService.newCourseNameValidator(editingCourse, newName);
+//
+//        if (courseRepo.findCourseByName(newName) != null)
+//        {
+//            System.out.println("A course by that name already exists!");
+//            throw new ResourcePersistenceException("User provided a course name that already exists.");
+//        }
+//
+//        courseRepo.updatingCourseName(editingCourse, newName);
+//
+//    }
+//    public void updateCourseAbv(Course editingCourse, String newAbv){
+//
+//        courseValidatorService.newCourseAbvValidator(editingCourse, newAbv);
+//
+//        if (courseRepo.findCourseByAbbreviation(newAbv) != null)
+//        {
+//            System.out.println("A course with that abbreviation already exists!");
+//            throw new ResourcePersistenceException("User provided an abbreviation that already exists.");
+//        }
+//
+//        courseRepo.updatingCourseAbv(editingCourse, newAbv);
+//
+//    }
+//    public void updateCourseDesc(Course editingCourse, String newDesc){
+//
+//        courseValidatorService.newCourseDetailsValidator(newDesc);
+//
+//        courseRepo.updatingCourseDesc(editingCourse, newDesc);
+//
+//    }
 
     // Used to check if the user entered a valid abbreviation
     public Course findCourseByAbbreviation(String abv){
@@ -156,5 +165,16 @@ public class CourseService {
 
         return openCourses;
     }
+    public List<Course> getAllCourses(){
 
+        List<Course> courses = courseRepo.findAll();
+
+        if(courses.isEmpty())
+        {
+            System.out.println("There are no courses! What kind of university is this?");
+            throw new NoOpenCoursesException("No courses found.");
+        }
+
+        return courses;
+    }
 }

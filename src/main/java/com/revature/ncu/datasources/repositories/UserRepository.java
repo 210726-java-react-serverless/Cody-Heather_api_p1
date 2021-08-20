@@ -61,6 +61,22 @@ public class UserRepository implements CrudRepository<AppUser>{
         }
     }
 
+    // For grabbing professor name when creating a new course.
+    public String getProfName(String id) {
+
+        try {
+
+            Document queryDoc = new Document("_id", id);
+            AppUser prof = usersCollection.find(queryDoc).first();
+            return prof.getFirstName() + " " + prof.getLastName();
+
+        } catch (Exception e) {
+            logger.error("An unexpected exception occurred.", e);
+            throw new DataSourceException(e);
+        }
+
+    }
+
     // For listing all users (admin use)
     @Override
     public List<AppUser> findAll() {

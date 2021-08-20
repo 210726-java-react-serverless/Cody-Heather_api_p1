@@ -11,7 +11,6 @@ import com.revature.ncu.datasources.repositories.UserRepository;
 import com.revature.ncu.datasources.utils.MongoClientFactory;
 import com.revature.ncu.services.*;
 import com.revature.ncu.util.PasswordUtils;
-import com.revature.ncu.web.dtos.Principal;
 import com.revature.ncu.web.servlets.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +47,10 @@ public class ContextLoaderListener implements ServletContextListener {
         HelloWorld helloWorld = new HelloWorld();
         GoodbyeWorld goodbyeWorld= new GoodbyeWorld();
         HealthCheckServlet healthCheckServlet = new HealthCheckServlet();
+        FacultyServlet facultyServlet = new FacultyServlet();
+        CourseServlet courseServlet = new CourseServlet(userService, courseService, mapper);
+        StudentServlet studentServlet = new StudentServlet();
+        StudentCourseServlet studentCourseServlet = new StudentCourseServlet(userService,courseService,userCoursesService,mapper);
 
         ServletContext servletContext = sce.getServletContext();
         servletContext.addServlet("HelloWorld", helloWorld).addMapping("/hello");
@@ -55,6 +58,10 @@ public class ContextLoaderListener implements ServletContextListener {
         servletContext.addServlet("AuthServlet", authServlet).addMapping("/auth");
         servletContext.addServlet("GoodbyeWorld", goodbyeWorld).addMapping("/goodbye");
         servletContext.addServlet("HealthCheckServlet", healthCheckServlet).addMapping("/health");
+        servletContext.addServlet("FacultyServlet", facultyServlet).addMapping("/faculty");
+        servletContext.addServlet("CourseServlet", courseServlet).addMapping("/faculty/courses");
+        servletContext.addServlet("StudentServlet", studentServlet).addMapping("/student");
+        servletContext.addServlet("StudentCourseServlet", studentCourseServlet).addMapping("/student/courses");
 
         configureLogback(servletContext);
 
