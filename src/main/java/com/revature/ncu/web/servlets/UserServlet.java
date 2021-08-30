@@ -1,15 +1,16 @@
 package com.revature.ncu.web.servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.revature.ncu.datasources.documents.AppUser;
 import com.revature.ncu.services.UserService;
+import com.revature.ncu.util.exceptions.InvalidEntryException;
 import com.revature.ncu.util.exceptions.InvalidRequestException;
 import com.revature.ncu.util.exceptions.ResourceNotFoundException;
 import com.revature.ncu.util.exceptions.ResourcePersistenceException;
 import com.revature.ncu.web.dtos.AppUserDTO;
 import com.revature.ncu.web.dtos.ErrorResponse;
 import com.revature.ncu.web.dtos.Principal;
+import com.revature.ncu.web.util.security.TokenGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,36 +18,37 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+
+/**
+ * Servlet for creating or viewing users.
+ * */
 public class UserServlet extends HttpServlet {
 
     private final Logger logger = LoggerFactory.getLogger(UserServlet.class);
     private final UserService userService;
     private final ObjectMapper mapper;
+    private final TokenGenerator tokenGenerator;
 
-    public UserServlet(UserService userService, ObjectMapper mapper){
+    public UserServlet(UserService userService, ObjectMapper mapper, TokenGenerator tokenGenerator){
         this.userService = userService;
         this.mapper = mapper;
+        this.tokenGenerator = tokenGenerator;
     }
 
     // For viewing users (admin only)
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println(req.getAttribute("filtered"));
         PrintWriter respWriter = resp.getWriter();
         resp.setContentType("application/json");
 
-        // Get the session from the request, if it exists (do not create one)
-        HttpSession session = req.getSession(false);
+        // Get the principal information from the request, if it exists.
+        Principal requestingUser = (Principal) req.getAttribute("principal");
 
-        // If the session is not null, then grab the auth-user attribute from it
-        Principal requestingUser = (session == null) ? null : (Principal) session.getAttribute("auth-user");
-
-        // Check to see if there was a valid auth-user attribute
+        // Check to see if the user is logged in
         if (requestingUser == null) {
             String msg = "No session found, please login.";
             logger.info(msg);
@@ -94,30 +96,34 @@ public class UserServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        System.out.println(req.getAttribute("filtered")); //servlet request, get attribute, used to read incoming input
-        PrintWriter respWriter = resp.getWriter();          //response writer, for replying
-        resp.setContentType("application/json");            //always gotta set this, he mentioned it several times
+        PrintWriter respWriter = resp.getWriter();
+        resp.setContentType("application/json");
 
         try {
-            //when a POST request is sent to the servlet, it reads the body and attempts to map it to a new AppUser
             AppUser newUser = mapper.readValue(req.getInputStream(), AppUser.class);
-            Principal principal = new Principal(userService.register(newUser)); // after this, the newUser should have a new id
-            String payload = mapper.writeValueAsString(principal);  //maps the principal value to a string
-            respWriter.write(payload);      //returning the username and ID to the web as a string value
-            resp.setStatus(201);            //201: Created
+            Principal principal = new Principal(userService.register(newUser));
+            String payload = mapper.writeValueAsString(principal);
+            respWriter.write(payload);
+            resp.setStatus(201);
 
-        } catch (InvalidRequestException | MismatchedInputException e) {
-            e.printStackTrace();
-            resp.setStatus(400); // client's fault
-            ErrorResponse errResp = new ErrorResponse(400, e.getMessage());
+            String token = tokenGenerator.createToken(principal);
+            resp.setHeader(tokenGenerator.getJwtConfig().getHeader(), token);
+
+        } catch (InvalidRequestException | InvalidEntryException ie) {
+            // Duplicate/invalid data provided.
+            ie.printStackTrace();
+            resp.setStatus(400);
+            ErrorResponse errResp = new ErrorResponse(400, ie.getMessage());
             respWriter.write(mapper.writeValueAsString(errResp));
         } catch (ResourcePersistenceException rpe) {
-            resp.setStatus(409);   //409 conflict: user/email already exists
+            // Duplicate information
+            resp.setStatus(409);
             ErrorResponse errResp = new ErrorResponse(409, rpe.getMessage());
             respWriter.write(mapper.writeValueAsString(errResp));
         } catch (Exception e) {
+            // Server error
             e.printStackTrace();
-            resp.setStatus(500);    // server made an oopsie woopsie
+            resp.setStatus(500);
         }
 
 

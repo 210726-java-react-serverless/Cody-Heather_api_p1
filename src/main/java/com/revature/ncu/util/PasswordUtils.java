@@ -3,12 +3,10 @@ package com.revature.ncu.util;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Properties;
-import java.util.Random;
 
         /** The PasswordUtils class provides methods to generate encrypted passwords from plaintext, and to compare plaintext
  * passwords to encrypted passwords with their hash keys.
@@ -22,8 +20,6 @@ import java.util.Random;
 public class PasswordUtils {
 
     private String salt;
-    private final Random random = new SecureRandom();
-
 
     public PasswordUtils() {
         Properties appProperties = new Properties();

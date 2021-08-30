@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-//Repository for performing CRUD operations on the Mongo user collection.
+/**
+ * Repository for performing CRUD operations on the Mongo user collection.
+ * */
 public class UserRepository implements CrudRepository<AppUser>{
 
     private final Logger logger = LoggerFactory.getLogger(UserRepository.class);
@@ -33,7 +35,7 @@ public class UserRepository implements CrudRepository<AppUser>{
             return usersCollection.find(queryDoc).first();
         }
             catch (Exception e) {
-            logger.error("An unexpected exception occurred.", e);
+            logger.error("An unexpected exception occurred.");
             throw new DataSourceException(e);
         }
 
@@ -45,7 +47,7 @@ public class UserRepository implements CrudRepository<AppUser>{
         try {
             return usersCollection.find(new Document("username", username)).first();
         } catch (Exception e) {
-            logger.error("An unexpected exception occurred.", e);
+            logger.error("An unexpected exception occurred.");
             throw new DataSourceException(e);
         }
 
@@ -56,12 +58,13 @@ public class UserRepository implements CrudRepository<AppUser>{
         try {
             return usersCollection.find(new Document("email", email)).first();
         } catch (Exception e) {
-            logger.error("An unexpected exception occurred.", e);
+            logger.error("An unexpected exception occurred.");
             throw new DataSourceException(e);
         }
     }
 
-    // For grabbing professor name when creating a new course.
+    // For grabbing professor name when creating a new course or
+    // updating the professor name if a different professor edits the course.
     public String getProfName(String id) {
 
         try {
@@ -71,7 +74,7 @@ public class UserRepository implements CrudRepository<AppUser>{
             return prof.getFirstName() + " " + prof.getLastName();
 
         } catch (Exception e) {
-            logger.error("An unexpected exception occurred.", e);
+            logger.error("An unexpected exception occurred.");
             throw new DataSourceException(e);
         }
 
@@ -86,7 +89,7 @@ public class UserRepository implements CrudRepository<AppUser>{
         try {
             usersCollection.find().into(users);
         } catch (Exception e) {
-            logger.error("An unexpected exception occurred.", e);
+            logger.error("An unexpected exception occurred.");
             throw new DataSourceException(e);
         }
         return users;
@@ -102,7 +105,7 @@ public class UserRepository implements CrudRepository<AppUser>{
             return usersCollection.find(queryDoc).first();
 
         } catch (Exception e) {
-            logger.error("An unexpected exception occurred.", e);
+            logger.error("An unexpected exception occurred.");
             throw new DataSourceException(e);
         }
 
@@ -117,7 +120,7 @@ public class UserRepository implements CrudRepository<AppUser>{
             return newUser;
 
         } catch (Exception e) {
-            logger.error("An unexpected exception occurred.", e);
+            logger.error("An unexpected exception occurred.");
             throw new DataSourceException(e);
         }
     }

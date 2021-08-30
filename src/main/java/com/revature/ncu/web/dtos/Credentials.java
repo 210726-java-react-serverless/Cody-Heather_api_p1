@@ -2,8 +2,9 @@ package com.revature.ncu.web.dtos;
 
 import java.util.Objects;
 
-/*
-* This DTO is going to be used for when users login and currently that is it. To my understanding.*/
+/**
+ * For wrapping a user's credentials on request.
+ * */
 public class Credentials {
 
     private String username;

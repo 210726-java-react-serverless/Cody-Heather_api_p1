@@ -1,10 +1,7 @@
 package com.revature.ncu.services;
 
 import com.revature.ncu.datasources.documents.Course;
-import com.revature.ncu.util.exceptions.InvalidCourseAbbreviationException;
-import com.revature.ncu.util.exceptions.InvalidCourseDescriptionException;
-import com.revature.ncu.util.exceptions.InvalidCourseNameException;
-import com.revature.ncu.util.exceptions.InvalidEntryException;
+import com.revature.ncu.util.exceptions.*;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,26 +23,27 @@ public class CourseValidatorServiceTestSuite {
         sut = null;
     }
 
-    // Course Entry Validator Tests
+    // New Course Entry Validator Tests
 
-//    @Test
-//    public void newCourseEntryValidator_returnsTrue_whenGivenValidCourse(){
-//        // Arrange
-//        Course validCourse = new Course("ValidCourse","VLD101","This is a valid course."
-//                ,"M.Bison", LocalDate.parse("2021-11-11"),LocalDate.parse("2021-11-13"),13);
-//
-//        // Act
-//        sut.newCourseEntryValidator(validCourse);
-//
-//        //Assert
-//        Assert.assertTrue(sut.newCourseEntryValidator(validCourse));
-//
-//    }
+    @Test
+    public void newCourseEntryValidator_returnsTrue_whenGivenValidCourse(){
+        // Arrange
+        Course validCourse = new Course("ValidCourse","VLD101","This is a valid course."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2021-11-13"),13);
+
+        // Act
+        sut.newCourseEntryValidator(validCourse);
+
+        //Assert
+        Assert.assertTrue(sut.newCourseEntryValidator(validCourse));
+
+    }
 
     @Test(expected = InvalidEntryException.class)
     public void newCourseEntryValidator_throwsException_whenGivenInvalidCourse_withBlankValues(){
         // Arrange
-        Course invalidCourse = new Course("","","");
+        Course invalidCourse = new Course("","",""
+                , null, null,0);
 
         // Act
         sut.newCourseEntryValidator(invalidCourse);
@@ -54,9 +52,8 @@ public class CourseValidatorServiceTestSuite {
     @Test(expected = InvalidCourseNameException.class)
     public void newCourseEntryValidator_throwsException_whenGivenInvalidCourseName_tooLong(){
         // Arrange
-        Course invalidCourse = new Course("maaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaath",
-                "MTH","This course name is too long.");
-
+        Course invalidCourse = new Course("maaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaath","VLD101","This is an invalid course."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2021-11-13"),13);
         // Act
         sut.newCourseEntryValidator(invalidCourse);
     }
@@ -64,8 +61,8 @@ public class CourseValidatorServiceTestSuite {
     @Test(expected = InvalidCourseNameException.class)
     public void newCourseEntryValidator_throwsException_whenGivenInvalidCourseName_tooShort(){
         // Arrange
-        Course invalidCourse = new Course("math","MTH101"
-                ,"This course name is too short.");
+        Course invalidCourse = new Course("math","VLD101","This is a invalid course."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2021-11-13"),13);
 
         // Act
         sut.newCourseEntryValidator(invalidCourse);
@@ -74,9 +71,8 @@ public class CourseValidatorServiceTestSuite {
     @Test(expected = InvalidCourseAbbreviationException.class)
     public void newCourseEntryValidator_throwsException_whenGivenInvalidCourseAbbreviation(){
         // Arrange
-        Course invalidCourse = new Course("Mathematics","Invalid"
-                ,"This course abbreviation is too long.");
-
+        Course invalidCourse = new Course("Mathematics for nerds","VLD101010101","This is a invalid course."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2021-11-13"),13);
         // Act
         sut.newCourseEntryValidator(invalidCourse);
     }
@@ -84,8 +80,8 @@ public class CourseValidatorServiceTestSuite {
     @Test(expected = InvalidCourseDescriptionException.class)
     public void newCourseEntryValidator_throwsException_whenGivenInvalidCourseDetail_tooShort(){
         // Arrange
-        Course invalidCourse = new Course("Mathematics","MTH101"
-                ,"Invalid");
+        Course invalidCourse = new Course("Mathematics","VLD101","Invalid."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2021-11-13"),13);
 
         // Act
         sut.newCourseEntryValidator(invalidCourse);
@@ -94,148 +90,255 @@ public class CourseValidatorServiceTestSuite {
     @Test(expected = InvalidCourseDescriptionException.class)
     public void newCourseEntryValidator_throwsException_whenGivenInvalidCourseDetail_tooLong(){
         // Arrange
-        Course invalidCourse = new Course("Mathematics","MTH101","Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum");
+        Course invalidCourse = new Course("Mathematics","VLD101","Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum"
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2021-11-13"),13);
 
         // Act
         sut.newCourseEntryValidator(invalidCourse);
     }
 
-    // newCourseNameValidator tests
-//    @Test
-//    public void newCourseNameValidator_returnsTrue_whenGivenValidName(){
-//        // Arrange
-//        String validName = "ValidName";
-//        Course original = new Course("ValidCourse","VLD101","This is a valid course.");
-//
-//        // Act
-//        sut.newCourseNameValidator(original,validName);
-//
-//        //Assert
-//        Assert.assertTrue(sut.newCourseNameValidator(original,validName));
-//    }
-//
-//    @Test(expected = InvalidEntryException.class)
-//    public void newCourseNameValidator_throwsException_whenGivenEmptyName(){
-//        // Arrange
-//        String invalidName = "";
-//        Course original = new Course("ValidCourse","VLD101","This is a valid course.");
-//
-//        // Act
-//        sut.newCourseNameValidator(original,invalidName);
-//
-//    }
-//
-//    @Test(expected = InvalidCourseNameException.class)
-//    public void newCourseNameValidator_throwsException_whenGivenName_thatIsTooLong(){
-//        // Arrange
-//        String invalidName = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-//        Course original = new Course("ValidCourse","VLD101","This is a valid course.");
-//
-//        // Act
-//        sut.newCourseNameValidator(original,invalidName);
-//
-//    }
-//
-//    @Test(expected = InvalidCourseNameException.class)
-//    public void newCourseNameValidator_throwsException_whenGivenName_thatIsTooShort(){
-//        // Arrange
-//        String invalidName = "AAA";
-//        Course original = new Course("ValidCourse","VLD101","This is a valid course.");
-//
-//        // Act
-//        sut.newCourseNameValidator(original,invalidName);
-//
-//    }
-//
-//    //newCourseAbvValidator
-//    @Test
-//    public void newCourseAbvValidator_returnsTrue_whenGivenAbbreviation(){
-//        // Arrange
-//        String validAbv = "VALID";
-//        Course original = new Course("ValidCourse","VLD101","This is a valid course.");
-//
-//        // Act
-//        sut.newCourseAbvValidator(original,validAbv);
-//
-//        //Assert
-//        Assert.assertTrue(sut.newCourseAbvValidator(original,validAbv));
-//    }
-//
-//    @Test(expected = InvalidEntryException.class)
-//    public void newCourseAbvValidator_throwsException_whenGivenBlankAbbreviation(){
-//        // Arrange
-//        String invalidAbv = "";
-//        Course original = new Course("ValidCourse","VLD101","This is a valid course.");
-//
-//        // Act
-//        sut.newCourseAbvValidator(original,invalidAbv);
-//
-//    }
-//
-//    @Test(expected = InvalidCourseAbbreviationException.class)
-//    public void newCourseAbvValidator_throwsException_whenGivenAbbreviation_thatIsTooLong(){
-//        // Arrange
-//        String invalidAbv = "AAAAAAAA";
-//        Course original = new Course("ValidCourse","VLD101","This is a valid course.");
-//
-//        // Act
-//        sut.newCourseAbvValidator(original,invalidAbv);
-//
-//    }
-//
-//    @Test(expected = InvalidCourseAbbreviationException.class)
-//    public void newCourseAbvValidator_throwsException_whenGivenAbbreviation_thatIsLongerThanCourseName(){
-//        // Arrange
-//        String invalidAbv = "AAAAAA";
-//        Course original = new Course("Valid","VLD101","This is a valid course.");
-//
-//        // Act
-//        sut.newCourseAbvValidator(original,invalidAbv);
-//
-//    }
-//
-//    // newCourseDetailsValidator
-//
-//    @Test
-//    public void newCourseDetailsValidator_returnsTrue_whenGivenValidDescription(){
-//        // Arrange
-//        String validDesc = "This description is also valid.";
-//
-//        // Act
-//        sut.newCourseDetailsValidator(validDesc);
-//
-//        //Assert
-//        Assert.assertTrue(sut.newCourseDetailsValidator(validDesc));
-//    }
-//
-//    @Test(expected = InvalidEntryException.class)
-//    public void newCourseDetailsValidator_throwsException_whenGivenBlankDescription(){
-//        // Arrange
-//        String invalidDesc = "";
-//
-//        // Act
-//        sut.newCourseDetailsValidator(invalidDesc);
-//
-//    }
-//
-//    @Test(expected = InvalidCourseDescriptionException.class)
-//    public void newCourseDetailsValidator_throwsException_whenGivenDescriptionTooShort(){
-//        // Arrange
-//        String invalidDesc = "Aw heck";
-//
-//        // Act
-//        sut.newCourseDetailsValidator(invalidDesc);
-//
-//    }
-//
-//    @Test(expected = InvalidCourseDescriptionException.class)
-//    public void newCourseDetailsValidator_throwsException_whenGivenDescriptionTooLong(){
-//        // Arrange
-//        String invalidDesc = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
-//
-//        // Act
-//        sut.newCourseDetailsValidator(invalidDesc);
-//
-//    }
+    @Test(expected = InvalidCourseCapacityException.class)
+    public void newCourseEntryValidator_throwsException_whenGivenInvalidCourseCap_tooLow(){
+        // Arrange
+        Course invalidCourse = new Course("Mathematics","VLD101","This is an invalid course."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2021-11-13"),1);
 
+        // Act
+        sut.newCourseEntryValidator(invalidCourse);
+    }
+
+    @Test(expected = InvalidCourseCapacityException.class)
+    public void newCourseEntryValidator_throwsException_whenGivenInvalidCourseCap_tooHigh(){
+        // Arrange
+        Course invalidCourse = new Course("Mathematics","VLD101","This is an invalid course."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2021-11-13"),101);
+
+        // Act
+        sut.newCourseEntryValidator(invalidCourse);
+    }
+
+    @Test(expected = InvalidCourseDateException.class)
+    public void newCourseEntryValidator_throwsException_whenGivenInvalidCourseOpenDate_afterCloseDate(){
+        // Arrange
+        Course invalidCourse = new Course("Mathematics","VLD101","why man why?"
+                , LocalDate.parse("2021-11-13"),LocalDate.parse("2021-11-11"),13);
+
+        // Act
+        sut.newCourseEntryValidator(invalidCourse);
+    }
+
+    @Test(expected = InvalidCourseDateException.class)
+    public void newCourseEntryValidator_throwsException_whenGivenInvalidCourseCloseDate_beforeCurrentDate(){
+        // Arrange
+        Course invalidCourse = new Course("Mathematics","VLD101","why man why?"
+                , LocalDate.parse("2021-04-13"),LocalDate.parse("2021-08-27"),13);
+
+        // Act
+        sut.newCourseEntryValidator(invalidCourse);
+    }
+
+    //isOpen Tests
+    @Test
+    public void isOpen_returnsTrue_whenGivenOpenCourse(){
+        // Arrange
+        Course validCourse = new Course("Mathematics","VLD101","This is an valid course."
+                , LocalDate.parse("2021-08-11"),LocalDate.parse("2024-11-13"),12);
+        boolean open;
+        // Act
+        open = sut.isOpen(validCourse);
+
+        // Assert
+        Assert.assertTrue(open);
+
+    }
+
+    @Test
+    public void isOpen_returnsTrue_whenGivenCourse_openToday(){
+        // Arrange
+        Course validCourse = new Course("Mathematics","VLD101","This is an valid course."
+                , LocalDate.now(),LocalDate.parse("2024-11-13"),12);
+        boolean open;
+        // Act
+        open = sut.isOpen(validCourse);
+
+        // Assert
+        Assert.assertTrue(open);
+
+    }
+
+    @Test
+    public void isOpen_returnsFalse_whenGivenClosedCourse(){
+        // Arrange
+        Course validCourse = new Course("Mathematics","VLD101","This is an valid course."
+                , LocalDate.parse("2021-08-11"),LocalDate.parse("2021-08-13"),12);
+        boolean open;
+        // Act
+        open = sut.isOpen(validCourse);
+
+        // Assert
+        Assert.assertFalse(open);
+
+    }
+
+    @Test
+    public void courseUpdateValidator_returnsTrue_whenGivenValidUpdate(){
+        //Arrange
+        Course validOriginal = new Course("ValidCourse","VLD101","This is a valid course."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2021-11-13"),13);
+
+        Course validUpdatingCourse = new Course("ValidUpdateCourse","VLD201","This is a valid changed course detail."
+                , LocalDate.parse("2021-10-11"),LocalDate.parse("2021-10-13"),42);
+        boolean valid;
+        //Act
+        valid = sut.courseUpdateValidator(validOriginal, validUpdatingCourse);
+
+        //Assert
+        Assert.assertTrue(valid);
+    }
+
+    @Test(expected = InvalidEntryException.class)
+    public void courseUpdateValidator_throwsException_whenFieldsAreBlank(){
+        //Arrange
+        Course validOriginal = new Course("ValidCourse","VLD101","This is a valid course."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2021-11-13"),13);
+
+        Course invalidUpdatingCourse = new Course("","",""
+                , null,null,0);
+
+        //Act
+        sut.courseUpdateValidator(validOriginal, invalidUpdatingCourse);
+    }
+
+    @Test(expected = InvalidCourseNameException.class)
+    public void courseUpdateValidator_throwsException_whenCourseNameIsTooLong(){
+        //Arrange
+        Course validOriginal = new Course("ValidCourse","VLD101","This is a valid course."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2021-11-13"),13);
+
+        Course invalidUpdatingCourse = new Course("ValidUpdateCourseValidUpdateCourseValidUpdateCourseValidUpdateCourseValidUpdateCourse","VLD201","This is a valid changed course detail."
+                , LocalDate.parse("2021-10-11"),LocalDate.parse("2021-10-13"),42);
+
+        //Act
+        sut.courseUpdateValidator(validOriginal, invalidUpdatingCourse);
+    }
+
+    @Test(expected = InvalidCourseNameException.class)
+    public void courseUpdateValidator_throwsException_whenCourseNameIsTooshort(){
+        //Arrange
+        Course validOriginal = new Course("ValidCourse","VLD101","This is a valid course."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2021-11-13"),13);
+
+        Course invalidUpdatingCourse = new Course("Val","VLD201","This is a valid changed course detail."
+                , LocalDate.parse("2021-10-11"),LocalDate.parse("2021-10-13"),42);
+
+        //Act
+        sut.courseUpdateValidator(validOriginal, invalidUpdatingCourse);
+    }
+
+
+
+    @Test(expected = InvalidCourseAbbreviationException.class)
+    public void courseUpdateValidator_throwsException_ifCourseAbbeviationIsTooLong(){
+        //Arrange
+        Course validOriginal = new Course("ValidCourse","VLD101","This is a valid course."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2021-11-13"),13);
+
+        Course invalidUpdatingCourse = new Course("ValidCourse","VLD20142","This is a valid changed course detail."
+                , LocalDate.parse("2021-10-11"),LocalDate.parse("2021-10-13"),42);
+
+        //Act
+        sut.courseUpdateValidator(validOriginal, invalidUpdatingCourse);
+    }
+
+    @Test(expected = InvalidCourseDescriptionException.class)
+    public void courseUpdateValidator_throwsException_ifCourseDescriptionTooShort(){
+        //Arrange
+        Course validOriginal = new Course("ValidCourse","VLD101","This is a valid course."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2021-11-13"),13);
+
+        Course invalidUpdatingCourse = new Course("ValidCourse","VLD201","This"
+                , LocalDate.parse("2021-10-11"),LocalDate.parse("2021-10-13"),42);
+
+        //Act
+        sut.courseUpdateValidator(validOriginal, invalidUpdatingCourse);
+    }
+
+    @Test(expected = InvalidCourseDescriptionException.class)
+    public void courseUpdateValidator_throwsException_whenNewDetail_isTooLong(){
+        //Arrange
+        Course original = new Course("ValidCourse","VLD101","This is a valid course."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2022-11-13"),13);
+
+        Course invalidUpdatingCourse = new Course("ValidUpdateCourse","VLD201","Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum"
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2022-11-13"),13);
+        //
+
+        sut.courseUpdateValidator(original, invalidUpdatingCourse);
+    }
+
+    @Test(expected = InvalidCourseCapacityException.class)
+    public void courseUpdateValidator_throwsException_whenNewCap_isBelowEnrolledStudents(){
+        //Arrange
+        Course original = new Course("ValidCourse","VLD101","This is a valid course."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2022-11-13"),13);
+
+        original.setSlotsTaken(13);
+        Course invalidUpdatingCourse = new Course("ValidUpdateCourse","VLD201","This is a valid changed course detail."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2022-11-13"),12);
+        //
+
+        sut.courseUpdateValidator(original, invalidUpdatingCourse);
+    }
+
+    @Test(expected = InvalidCourseCapacityException.class)
+    public void courseUpdateValidator_throwsException_whenNewCap_isTooLow(){
+        //Arrange
+        Course original = new Course("ValidCourse","VLD101","This is a valid course."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2022-11-13"),13);
+
+        Course invalidUpdatingCourse = new Course("ValidUpdateCourse","VLD201","This is a valid changed course detail."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2022-11-13"),8);
+        //
+
+        sut.courseUpdateValidator(original, invalidUpdatingCourse);
+    }
+
+    @Test(expected = InvalidCourseCapacityException.class)
+    public void courseUpdateValidator_throwsException_whenNewCap_isTooHigh(){
+        //Arrange
+        Course original = new Course("ValidCourse","VLD101","This is a valid course."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2022-11-13"),13);
+
+        Course invalidUpdatingCourse = new Course("ValidUpdateCourse","VLD201","This is a valid changed course detail."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2022-11-13"),101);
+        //
+
+        sut.courseUpdateValidator(original, invalidUpdatingCourse);
+    }
+
+    @Test(expected = InvalidCourseDateException.class)
+    public void courseUpdateValidator_throwsException_whenNewOpenDate_isAfterCloseDate(){
+        //Arrange
+        Course original = new Course("ValidCourse","VLD101","This is a valid course."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2022-11-13"),13);
+
+        Course invalidUpdatingCourse = new Course("ValidUpdateCourse","VLD201","This is a valid changed course detail."
+                , LocalDate.parse("2022-08-11"),LocalDate.parse("2021-10-13"),42);
+        //
+
+        sut.courseUpdateValidator(original, invalidUpdatingCourse);
+    }
+
+    @Test(expected = InvalidCourseDateException.class)
+    public void courseUpdateValidator_throwsException_whenNewCloseDate_isBeforeToday(){
+        //Arrange
+        Course original = new Course("ValidCourse","VLD101","This is a valid course."
+                , LocalDate.parse("2021-11-11"),LocalDate.parse("2022-11-13"),13);
+
+        Course invalidUpdatingCourse = new Course("ValidUpdateCourse","VLD201","This is a valid changed course detail."
+                , LocalDate.parse("2021-05-11"),LocalDate.parse("2021-07-13"),42);
+        //
+
+        sut.courseUpdateValidator(original, invalidUpdatingCourse);
+    }
 }

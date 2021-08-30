@@ -6,13 +6,13 @@ import java.util.Objects;
 /**
  * Class for sending a proper Success Response to the user.
  * */
-public class ErrorResponse {
+public class SuccessResponse {
 
     private int statusCode;
     private String message;
     private String timestamp;
 
-    public ErrorResponse(int statusCode, String message){
+    public SuccessResponse(int statusCode, String message){
         this.statusCode = statusCode;
         this.message = message;
         this.timestamp = LocalDateTime.now().toString();
@@ -46,7 +46,7 @@ public class ErrorResponse {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ErrorResponse that = (ErrorResponse) o;
+        SuccessResponse that = (SuccessResponse) o;
         return statusCode == that.statusCode && Objects.equals(message, that.message) && Objects.equals(timestamp, that.timestamp);
     }
 

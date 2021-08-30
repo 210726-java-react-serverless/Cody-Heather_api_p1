@@ -3,13 +3,17 @@ package com.revature.ncu.services;
 import com.revature.ncu.datasources.documents.Course;
 import com.revature.ncu.datasources.repositories.CourseRepository;
 import com.revature.ncu.util.exceptions.*;
+import com.revature.ncu.web.dtos.UserCourseDTO;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -123,102 +127,177 @@ public class CourseServiceTestSuite {
 
     }
 
+
+    // removeCourse Tests
+    @Test
+    public void removeCourse_executesSuccessfully_whenProvidedWithValidCourse(){
+        //Arrange
+        Course validCourse = new Course("VALID");
+        Course expectedCourse = new Course("VALID");
+        when(mockCourseRepo.findCourseByAbbreviation(validCourse.getCourseAbbreviation()))
+                .thenReturn(expectedCourse);
+
+        //Act
+        sut.removeCourse(validCourse);
+
+        //Assert
+        verify(mockCourseRepo, times(1))
+                .findCourseByAbbreviation(validCourse.getCourseAbbreviation());
+        verify(mockCourseRepo, times(1)).removeCourseByAbbreviation(validCourse);
+
+    }
+
+    @Test(expected = InvalidEntryException.class)
+    public void removeCourse_throwsException_whenGivenInvalidCourseAbbreviation() {
+        //Arrange
+        Course invalidCourse = new Course("NoVALID");
+        when(mockCourseRepo.findCourseByAbbreviation(invalidCourse.getCourseAbbreviation()))
+                .thenReturn(null);
+        //Act
+        sut.removeCourse(invalidCourse);
+    }
+
     //update tests
 
-//    @Test
-//    public void updateCourseName_ExecutesSuccessfully_whenProvidedValidCourseName(){
-//        //Arrange
-//        String validName = "ValidName";
-//        Course originalCourse = new Course("ValidCourse","VLDCS",
-//                "This is a valid course description");
-//        when(mockValidator.newCourseNameValidator(originalCourse,validName)).thenReturn(true);
-//        when(mockCourseRepo.findCourseByName(validName)).thenReturn(null);
-//
-//        //Act
-//        sut.updateCourseName(originalCourse,validName);
-//
-//        //Assert
-//        verify(mockValidator, times(1)).newCourseNameValidator(originalCourse,validName);
-//        verify(mockCourseRepo,times(1)).findCourseByName(validName);
-//        verify(mockCourseRepo, times(1)).updatingCourseName(originalCourse,validName);
-//    }
-//
-//    @Test(expected = ResourcePersistenceException.class)
-//    public void updateCourseName_throwsException_whenProvidedDuplicateCourseName(){
-//        // Arrange
-//        String duplicate = "Duplicate";
-//        Course originalCourse = new Course("Duplicate","VLDCS",
-//                "This is a valid course description");
-//        when(mockValidator.newCourseNameValidator(originalCourse,duplicate)).thenReturn(true);
-//        when(mockCourseRepo.findCourseByName(duplicate)).thenReturn(originalCourse);
-//        // Act
-//        try{
-//            sut.updateCourseName(originalCourse,duplicate);
-//        }finally {        // Assert
-//            verify(mockValidator, times(1)).newCourseNameValidator(originalCourse,duplicate);
-//            verify(mockCourseRepo,times(1)).findCourseByName(duplicate);
-//            verify(mockCourseRepo, times(0)).updatingCourseName(originalCourse,duplicate);
-//        }
-//
-//    }
-//
-//    @Test
-//    public void updateCourseAbbreviation_ExecutesSuccessfully_whenProvidedValidCourseAbbreviation(){
-//        //Arrange
-//        String validAbv = "VLDABV";
-//        Course originalCourse = new Course("ValidCourse","VLDCS",
-//                "This is a valid course description");
-//        when(mockValidator.newCourseAbvValidator(originalCourse,validAbv)).thenReturn(true);
-//        when(mockCourseRepo.findCourseByAbbreviation(validAbv)).thenReturn(null);
-//
-//        //Act
-//        sut.updateCourseAbv(originalCourse,validAbv);
-//
-//        //Assert
-//        verify(mockValidator, times(1)).newCourseAbvValidator(originalCourse,validAbv);
-//        verify(mockCourseRepo,times(1)).findCourseByAbbreviation(validAbv);
-//        verify(mockCourseRepo, times(1)).updatingCourseAbv(originalCourse,validAbv);
-//    }
-//
-//    @Test(expected = ResourcePersistenceException.class)
-//    public void updateCourseAbv_throwsException_whenProvidedDuplicateCourseAbv(){
-//        // Arrange
-//        String duplicate = "DUPE";
-//        Course originalCourse = new Course("Original","DUPE",
-//                "This is a valid course description");
-//        when(mockValidator.newCourseAbvValidator(originalCourse,duplicate)).thenReturn(true);
-//        when(mockCourseRepo.findCourseByAbbreviation(duplicate)).thenReturn(originalCourse);
-//        // Act
-//        try{
-//            sut.updateCourseAbv(originalCourse,duplicate);
-//        }finally {        // Assert
-//            verify(mockValidator, times(1)).newCourseAbvValidator(originalCourse,duplicate);
-//            verify(mockCourseRepo,times(1)).findCourseByAbbreviation(duplicate);
-//            verify(mockCourseRepo, times(0)).updatingCourseAbv(originalCourse,duplicate);
-//        }
-//
-//    }
-//
-//    @Test
-//    public void updateCourseDesc_ExecutesSuccessfully_whenProvidedValidCourseDesc(){
-//        //Arrange
-//        String validDescription = "This is also a valid course description.";
-//        Course originalCourse = new Course("ValidCourse","VLDCS",
-//                "This is a valid course description");
-//        when(mockValidator.newCourseDetailsValidator(validDescription)).thenReturn(true);
-//
-//        //Act
-//        sut.updateCourseDesc(originalCourse,validDescription);
-//
-//        //Assert
-//        verify(mockValidator, times(1)).newCourseDetailsValidator(validDescription);
-//        verify(mockCourseRepo, times(1)).updatingCourseDesc(originalCourse,validDescription);
-//    }
+    @Test
+    public void updateCourse_returnsCourse_whenProvidedWithValidCourse(){
+        // Arrange
+        Course original = new Course("ValidCourse","VLD101","This is a valid course.",
+                LocalDate.parse("2021-11-11"),LocalDate.parse("2021-11-13"),13);
+
+        Course validUpdate = new Course("ValidUpdateCourse","VLD201","This is a valid changed course detail.",
+                LocalDate.parse("2021-10-11"),LocalDate.parse("2022-10-13"),42);
+        when(mockValidator.courseUpdateValidator(original,validUpdate)).thenReturn(true);
+        when(mockCourseRepo.findCourseByAbbreviation("VLD201")).thenReturn(null);
+        when(mockCourseRepo.findCourseByName("ValidUpdateCourse")).thenReturn(null);
+        // Act
+        Course actualResult = sut.updateCourse(original, validUpdate);
+        // Assert
+        Assert.assertEquals(actualResult,validUpdate);
+    }
+
+    @Test(expected = ResourcePersistenceException.class)
+    public void updateCourse_throwsException_whenProvidedWithCourse_withDuplicateAbbreviation(){
+        // Arrange
+        Course original = new Course("ValidCourse","VLD101","This is a valid course.",
+                LocalDate.parse("2021-11-11"),LocalDate.parse("2021-11-13"),13);
+
+        Course duplicateAbv = new Course("Duplicate","DUPE","This is a valid changed course detail.",
+                LocalDate.parse("2021-10-11"),LocalDate.parse("2022-10-13"),42);
+
+        Course existingCourse = new Course("ValidUpdateCourse","DUPE","This is a valid changed course detail.",
+                LocalDate.parse("2021-10-11"),LocalDate.parse("2022-10-13"),42);
+
+        when(mockValidator.courseUpdateValidator(original,duplicateAbv)).thenReturn(true);
+        when(mockCourseRepo.findCourseByAbbreviation("DUPE")).thenReturn(existingCourse);
+        // Act
+        try{
+            sut.updateCourse(original, duplicateAbv);
+        }finally {// Assert
+            verify(mockValidator,times(1)).courseUpdateValidator(original,duplicateAbv);
+            verify(mockCourseRepo,times(1)).findCourseByAbbreviation("DUPE");
+        }
+    }
+
+    @Test(expected = ResourcePersistenceException.class)
+    public void updateCourse_throwsException_whenProvidedWithCourse_withDuplicateName(){
+        // Arrange
+        Course original = new Course("ValidCourse","VLD101","This is a valid course.",
+                LocalDate.parse("2021-11-11"),LocalDate.parse("2021-11-13"),13);
+
+        Course duplicateAbv = new Course("Duplicate","VLD201","This is a valid changed course detail.",
+                LocalDate.parse("2021-10-11"),LocalDate.parse("2022-10-13"),42);
+
+        Course existingCourse = new Course("Duplicate","TEST","This is a valid course detail.",
+                LocalDate.parse("2021-10-11"),LocalDate.parse("2022-10-13"),42);
+
+        when(mockValidator.courseUpdateValidator(original,duplicateAbv)).thenReturn(true);
+        when(mockCourseRepo.findCourseByAbbreviation("VLD201")).thenReturn(null);
+        when(mockCourseRepo.findCourseByName("Duplicate")).thenReturn(existingCourse);
+        // Act
+        try{
+            sut.updateCourse(original, duplicateAbv);
+        }finally {// Assert
+            verify(mockValidator,times(1)).courseUpdateValidator(original,duplicateAbv);
+            verify(mockCourseRepo,times(1)).findCourseByAbbreviation("VLD201");
+            verify(mockCourseRepo,times(1)).findCourseByName("Duplicate");
+        }
+    }
+
+
+    @Test
+    public void joinCourse_executesSuccessfully_whenProvidedWithValidAbbreviation(){
+        //Arrange
+        String joiningCourseAbv = "ABV101";
+        Course expected = new Course();
+        String username = "validusername";
+        Set<String> studentUsernames = new HashSet<String>();
+        when(mockCourseRepo.findCourseByAbbreviation(joiningCourseAbv)).thenReturn(expected);
+        when(mockValidator.isOpen(expected)).thenReturn(true);
+        //Act
+        sut.joinCourse(joiningCourseAbv,username);
+        //Assert
+        verify(mockCourseRepo,times(1)).findCourseByAbbreviation(joiningCourseAbv);
+        verify(mockValidator,times(1)).isOpen(expected);
+        verify(mockCourseRepo,times(1)).addStudentUsername(joiningCourseAbv,username);
+    }
+
+    @Test(expected = NoSuchCourseException.class)
+    public void joinCourse_throwsException_whenProvidedWithInValidAbbreviation() {
+        // Arrange
+        String joiningCourseAbv = "ABV101";
+        Course expected = new Course();
+        String username = "validusername";
+        Set<String> studentUsernames = new HashSet<String>();
+        when(mockCourseRepo.findCourseByAbbreviation(joiningCourseAbv)).thenReturn(null);
+        when(mockValidator.isOpen(expected)).thenReturn(true);
+        // Act
+        sut.joinCourse(joiningCourseAbv, username);
+        //Assert
+        verify(mockCourseRepo, times(1)).findCourseByAbbreviation(joiningCourseAbv);
+    }
+
+    @Test(expected = CourseNotOpenException.class)
+    public void joinCourse_throwsException_whenProvidedCourseIsClosed() {
+        // Arrange
+        String joiningCourseAbv = "ABV101";
+        Course expected = new Course();
+        String username = "validusername";
+        Set<String> studentUsernames = new HashSet<String>();
+        when(mockCourseRepo.findCourseByAbbreviation(joiningCourseAbv)).thenReturn(expected);
+        when(mockValidator.isOpen(expected)).thenReturn(false);
+        // Act
+        sut.joinCourse(joiningCourseAbv, username);
+        // Assert
+        verify(mockCourseRepo, times(1)).findCourseByAbbreviation(joiningCourseAbv);
+        verify(mockValidator,times(1)).isOpen(expected);
+    }
+
+    @Test(expected = AlreadyRegisteredForCourseException.class)
+    public void joinCourse_throwsException_whenUserIsAlreadyInClass() {
+        // Arrange
+        String joiningCourseAbv = "ABV101";
+        Course expected = new Course();
+        String username = "validusername";
+
+        Set<String> studentUsernames = new HashSet<>();
+        studentUsernames.add("validusername");
+        expected.setStudentUsernames(studentUsernames);
+
+        when(mockCourseRepo.findCourseByAbbreviation(joiningCourseAbv)).thenReturn(expected);
+        when(mockValidator.isOpen(expected)).thenReturn(true);
+        // Act
+        sut.joinCourse(joiningCourseAbv, username);
+        // Assert
+        verify(mockCourseRepo, times(1)).findCourseByAbbreviation(joiningCourseAbv);
+        verify(mockValidator,times(1)).isOpen(expected);
+    }
+
 
     // verifyCourse tests
 
     @Test
-    public void verifyCourse_returnsCourse_whenProvidedWithValidAbbreviation(){
+    public void findCourse_byAbbreviation_returnsCourse_whenProvidedWithValidAbbreviation(){
         // Arrange
         String validAbv = "VALID";
         Course expectedResult = new Course("ValidCourse","VALID",
@@ -248,119 +327,6 @@ public class CourseServiceTestSuite {
         }
     }
 
-    @Test(expected = InvalidEntryException.class)
-    public void verifyCourse_throwsException_whenProvidedWithBlankAbbreviation(){
-        // Arrange
-        String invalidAbv = "";
-        // Act
-        sut.findCourseByAbbreviation(invalidAbv);
-    }
-
-    //verifyCourseOpenByAbbreviation Tests
-
-    @Test
-    public void verifyCourseOpenByAbbreviation_returnsCourse_whenProvidedValidAbbreviation(){
-        // Arrange
-        String validAbv = "VALID";
-        Course expectedResult = new Course("ValidCourse","VALID",
-                "This is a valid course description");
-        Course validCourse = new Course("ValidCourse","VALID",
-                "This is a valid course description");
-        when(mockCourseRepo.findCourseByAbbreviation(validAbv)).thenReturn(validCourse);
-        // Act
-        Course actualResult = sut.verifyCourseOpenByAbbreviation(validAbv);
-        // Assert
-        Assert.assertEquals(expectedResult,actualResult);
-        verify(mockCourseRepo,times(1)).findCourseByAbbreviation(validAbv);
-    }
-
-    @Test(expected = CourseNotOpenException.class)
-    public void verifyCourseOpenByAbbreviation_throwsException_whenCourseClosed(){
-        // Arrange
-        String closedAbv = "TEST";
-        Course closedCourse = new Course("ValidCourse","TEST",
-                "This test will fail because open is false.");
-        when(mockCourseRepo.findCourseByAbbreviation(closedAbv)).thenReturn(closedCourse);
-        // Act
-        try{sut.verifyCourseOpenByAbbreviation(closedAbv);}
-        finally { // Assert
-            verify(mockCourseRepo, times(1)).findCourseByAbbreviation(closedAbv);
-        }
-    }
-
-    @Test(expected = NoSuchCourseException.class)
-    public void verifyCourseOpenByAbbreviation_throwsException_whenCourseNotFound(){
-        // Arrange
-        String invalidAbv = "TEST";
-        when(mockCourseRepo.findCourseByAbbreviation(invalidAbv)).thenReturn(null);
-        // Act
-        try{sut.verifyCourseOpenByAbbreviation(invalidAbv);}
-        finally { // Assert
-            verify(mockCourseRepo, times(1)).findCourseByAbbreviation(invalidAbv);
-        }
-    }
-
-    @Test(expected = InvalidEntryException.class)
-    public void verifyCourseOpenByAbbreviation_throwsException_whenProvidedEmptyInput(){
-        // Arrange
-        String invalidAbv = "";
-        // Act
-        sut.verifyCourseOpenByAbbreviation(invalidAbv);
-
-    }
-
-    //verifyCourseOpenByName Tests
-    @Test
-    public void verifyCourseOpenByName_returnsCourse_whenProvidedValidName(){
-        // Arrange
-        String validName = "ValidCourse";
-        Course expectedResult = new Course("ValidCourse","VALID",
-                "This is a valid course description");
-        Course validCourse = new Course("ValidCourse","VALID",
-                "This is a valid course description");
-        when(mockCourseRepo.findCourseByName(validName)).thenReturn(validCourse);
-        // Act
-        Course actualResult = sut.verifyCourseOpenByName(validName);
-        // Assert
-        Assert.assertEquals(expectedResult,actualResult);
-        verify(mockCourseRepo,times(1)).findCourseByName(validName);
-    }
-
-    @Test(expected = CourseNotOpenException.class)
-    public void verifyCourseOpenByName_throwsException_whenCourseClosed(){
-        // Arrange
-        String closedName = "Closed-course";
-        Course closedCourse = new Course("Closed-course","TEST",
-                "This test will fail because open is false.");
-        when(mockCourseRepo.findCourseByName(closedName)).thenReturn(closedCourse);
-        // Act
-        try{sut.verifyCourseOpenByName(closedName);}
-        finally { // Assert
-            verify(mockCourseRepo, times(1)).findCourseByName(closedName);
-        }
-    }
-
-    @Test(expected = NoSuchCourseException.class)
-    public void verifyCourseOpenByName_throwsException_whenCourseNotFound(){
-        // Arrange
-        String invalidName = "Spelunking 101";
-        when(mockCourseRepo.findCourseByName(invalidName)).thenReturn(null);
-        // Act
-        try{sut.verifyCourseOpenByName(invalidName);}
-        finally { // Assert
-            verify(mockCourseRepo, times(1)).findCourseByName(invalidName);
-        }
-    }
-
-    @Test(expected = InvalidEntryException.class)
-    public void verifyCourseOpenByName_throwsException_whenProvidedEmptyInput(){
-        // Arrange
-        String invalidName = "";
-        // Act
-        sut.verifyCourseOpenByName(invalidName);
-
-    }
-
     //getCourses test
 
     @Test
@@ -388,6 +354,137 @@ public class CourseServiceTestSuite {
 
     }
 
+    // getAllCourses tests
 
+    @Test
+    public void getAllCourses_returnsCourseList_whenSuccessful(){
+        // Arrange
+        Course course1 = new Course("ONE");
+        Course course2 = new Course("TWO");
+        Course course3 = new Course("THREE");
+        List<Course> validCourseList = new ArrayList<Course>(){{add(course1);add(course2);add(course3);}};
+        when(mockCourseRepo.findAll()).thenReturn(validCourseList);
+
+        // Act
+        List<Course> actualResult = sut.getAllCourses();
+
+        // Assert
+        verify(mockCourseRepo,times(1)).findAll();
+        Assert.assertEquals(actualResult,validCourseList);
+
+    }
+
+    @Test(expected = NoOpenCoursesException.class)
+    public void getAllCourses_throwsException_whenNoCoursesFound(){
+        // Arrange
+        List<Course> emptyCourseList = new ArrayList<>();
+        when(mockCourseRepo.findAll()).thenReturn(emptyCourseList);
+
+        // Act
+        try{
+            sut.getAllCourses();
+        } finally { // Assert
+            verify(mockCourseRepo,times(1)).findAll();
+        }
+
+    }
+
+    // getCoursesByUsername tests
+    @Test
+    public void getCoursesByUsername_returnsSuccessfully_whenCoursesWithUser_areFound(){
+        // Arrange
+        String username = "testUsername";
+        Course course = new Course("ValidCourse","VLD101","This is a valid course.",
+                LocalDate.parse("2020-11-11"),LocalDate.parse("2022-11-13"),13);
+        UserCourseDTO courseDTO = new UserCourseDTO(course);
+        List<UserCourseDTO> validCourseList = new ArrayList<UserCourseDTO>(){{add(courseDTO);}};
+        when(mockCourseRepo.findCoursesByUsername(username)).thenReturn(validCourseList);
+        // Act
+        List<UserCourseDTO> actualResult = sut.getCoursesByUsername(username);
+        // Assert
+        verify(mockCourseRepo,times(1)).findCoursesByUsername(username);
+        Assert.assertEquals(validCourseList,actualResult);
+    }
+
+    @Test(expected = NoOpenCoursesException.class)
+    public void getCoursesByUsername_throwsException_whenNoCoursesFound(){
+        // Arrange
+        String username = "testUsername";
+        List<UserCourseDTO> emptyCourseList = new ArrayList<UserCourseDTO>();
+        when(mockCourseRepo.findCoursesByUsername(username)).thenReturn(emptyCourseList);
+        // Act
+        List<UserCourseDTO> actualResult = sut.getCoursesByUsername(username);
+        // Assert
+        verify(mockCourseRepo,times(1)).findCoursesByUsername(username);
+    }
+
+    // removeStudent tests
+
+    @Test
+    public void removeStudent_executesSuccessfully_whenProvided_openCourse_withUserEnrolled(){
+        // Arrange
+        String validStudent = "username";
+        String validCourseAbv = "TEST";
+        Course openCourse = new Course("ValidCourse","TEST","This is a valid course.",
+                LocalDate.parse("2020-11-11"),LocalDate.parse("2023-11-13"),13);
+        Set<String> validStudentList = new HashSet<String>(){{add(validStudent);}};
+        openCourse.setStudentUsernames(validStudentList);
+        when(mockCourseRepo.findCourseByAbbreviation(validCourseAbv)).thenReturn(openCourse);
+        // Act
+        sut.removeStudent(validStudent,validCourseAbv);
+        // Assert
+        verify(mockCourseRepo, times(1)).findCourseByAbbreviation(validCourseAbv);
+        verify(mockCourseRepo, times(1)).removeStudent(validStudent, validCourseAbv);
+
+    }
+
+    @Test(expected = NoSuchCourseException.class)
+    public void removeStudent_throwsException_whenProvidedWith_courseDoesNotExist(){
+        // Arrange
+        String validStudent = "username";
+        String invalidCourseAbv = "TEST";
+        when(mockCourseRepo.findCourseByAbbreviation(invalidCourseAbv)).thenReturn(null);
+
+        // Act
+        sut.removeStudent(validStudent, invalidCourseAbv);
+
+    }
+
+    @Test(expected = NotRegisteredForCourseException.class)
+    public void removeStudent_throwsException_whenProvided_openCourse_withoutUserEnrolled(){
+        // Arrange
+        String validStudent = "username";
+        String validCourseAbv = "TEST";
+        Course emptyCourse = new Course("ValidCourse","TEST","This is a valid course.",
+                LocalDate.parse("2020-11-11"),LocalDate.parse("2023-11-13"),13);
+        when(mockCourseRepo.findCourseByAbbreviation(validCourseAbv)).thenReturn(emptyCourse);
+        // Act
+        try {
+            sut.removeStudent(validStudent, validCourseAbv);
+        }
+        finally {// Assert
+            verify(mockCourseRepo, times(1)).findCourseByAbbreviation(validCourseAbv);
+        }
+    }
+
+    @Test(expected = CourseNotOpenException.class)
+    public void removeStudent_throwsExcept_whenProvided_closedCourse(){
+        // Arrange
+        String validStudent = "username";
+        String validCourseAbv = "TEST";
+        Course closedCourse = new Course("ValidCourse","TEST","This is a valid course.",
+                LocalDate.parse("1990-11-11"),LocalDate.parse("1991-11-13"),13);
+        Set<String> validStudentList = new HashSet<String>(){{add(validStudent);}};
+        closedCourse.setStudentUsernames(validStudentList);
+        when(mockCourseRepo.findCourseByAbbreviation(validCourseAbv)).thenReturn(closedCourse);
+        // Act
+        try {
+            sut.removeStudent(validStudent, validCourseAbv);
+        } finally { // Assert
+            verify(mockCourseRepo, times(1)).findCourseByAbbreviation(validCourseAbv);
+            verify(mockCourseRepo, times(0)).removeStudent(validStudent, validCourseAbv);
+        }
+
+    }
 
 }

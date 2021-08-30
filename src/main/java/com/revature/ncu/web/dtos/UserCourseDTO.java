@@ -1,36 +1,35 @@
 package com.revature.ncu.web.dtos;
 
-/*
- * DTO = Data Transfer object.
- * This is a wrapper for an object to be transferred to the front end.
- */
-
 import com.revature.ncu.datasources.documents.Course;
-
 import java.util.Objects;
 
-public class CourseDTO {
+/**
+ * DTO = Data Transfer object.
+ * Wrapper for displaying course information to non-admin users, hides usernames of registered users.
+ */
+public class UserCourseDTO {
 
     private String id;
     private String courseName;
     private String courseAbbreviation;
     private String courseDetail;
     private String professorName;
-    private String courseOpenDate;      //TODO logic for these
-    private String courseCloseDate;     // Not sure if we want them displayed as strings, though...
+    private String courseOpenDate;
+    private String courseCloseDate;
     private int slotsTaken;
     private int courseCapacity;
 
 
-    public CourseDTO(Course subject) {
+    public UserCourseDTO(Course subject) {
         this.id = subject.getId();
         this.courseName = subject.getCourseName();
-        this.courseDetail = subject.getCourseAbbreviation();
-        this.professorName = subject.getCourseDetail();
+        this.courseAbbreviation = subject.getCourseAbbreviation();
+        this.courseDetail = subject.getCourseDetail();
+        this.professorName = subject.getProfessorName();
         this.courseOpenDate = subject.getCourseOpenDate().toString();
         this.courseCloseDate = subject.getCourseCloseDate().toString();
-        this.courseCapacity = subject.getCourseCapacity();
         this.slotsTaken = subject.getSlotsTaken();
+        this.courseCapacity = subject.getCourseCapacity();
     }
 
     public String getId() {
@@ -101,8 +100,8 @@ public class CourseDTO {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CourseDTO courseDTO = (CourseDTO) o;
-        return Objects.equals(id, courseDTO.id) && Objects.equals(courseName, courseDTO.courseName) && Objects.equals(courseAbbreviation, courseDTO.courseAbbreviation) && Objects.equals(courseDetail, courseDTO.courseDetail) && Objects.equals(professorName, courseDTO.professorName) && Objects.equals(courseOpenDate, courseDTO.courseOpenDate) && Objects.equals(courseCloseDate, courseDTO.courseCloseDate);
+        UserCourseDTO userCourseDTO = (UserCourseDTO) o;
+        return Objects.equals(id, userCourseDTO.id) && Objects.equals(courseName, userCourseDTO.courseName) && Objects.equals(courseAbbreviation, userCourseDTO.courseAbbreviation) && Objects.equals(courseDetail, userCourseDTO.courseDetail) && Objects.equals(professorName, userCourseDTO.professorName) && Objects.equals(courseOpenDate, userCourseDTO.courseOpenDate) && Objects.equals(courseCloseDate, userCourseDTO.courseCloseDate);
     }
 
     @Override

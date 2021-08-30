@@ -1,11 +1,11 @@
 package com.revature.ncu.datasources.documents;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.util.Objects;
 
 
-// AppUser POJO
+/**
+ * The AppUser POJO for holding a user's information to be delivered to the database.
+ * */
 public class AppUser {
 
 

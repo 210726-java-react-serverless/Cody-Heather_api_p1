@@ -13,7 +13,9 @@ import com.revature.ncu.web.dtos.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// Service for handling most User-related business logic and passing information into the User repository
+/**
+ * Service for handling User-related business logic and passing information into the User repository
+ **/
 
 public class UserService {
 
@@ -40,7 +42,7 @@ public class UserService {
         }
 
         if (userRepo.findUserByEmail(newUser.getEmail()) != null) {
-            throw new ResourcePersistenceException("Provided username is already taken!");
+            throw new ResourcePersistenceException("Provided email is already taken!");
         }
 
         // Encrypt password for sending to server storage
@@ -51,18 +53,11 @@ public class UserService {
 
     }
 
+    /**
+     * Grabs all user objects from the repo, streams it into an iterable list,
+     * maps a new AppUserDTO for each AppUser, and collects them all into a list.
+     * */
 
-
-    //  List<AppUserDTO> list = new ArrayList<>();
-    //        for (AppUser appUser : userRepo.findAll()) {
-    //            AppUserDTO appUserDTO = new AppUserDTO(appUser);
-    //            list.add(appUserDTO);
-    //        }
-    //        return list;
-    //
-    // ^^ this is the same thing as the block of code below.
-    // Grabs all user objects from the repo, streams it into an iterable list, maps a new AppUserDTO
-    // for each AppUser, and collects them all into a list.
     public List<AppUserDTO> findAll() {
         return userRepo.findAll()
                 .stream()
@@ -100,9 +95,6 @@ public class UserService {
     }
 
     public String getProfNameById(String id){
-
-        // shouldn't need to check ID
-
         return userRepo.getProfName(id);
     }
 

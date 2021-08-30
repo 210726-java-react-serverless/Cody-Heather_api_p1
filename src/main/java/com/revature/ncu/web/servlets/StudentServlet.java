@@ -1,8 +1,5 @@
 package com.revature.ncu.web.servlets;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -11,12 +8,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 
-// Dashboard for student options.
-// TODO connect to StudentCourse servlet and logout servlet
+/**
+ * Student servlet, unused -- would be for changing student profile info, etc.
+ */
 public class StudentServlet extends HttpServlet {
 
-    private final Logger logger = LoggerFactory.getLogger(StudentServlet.class);
 
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException
     {
@@ -24,10 +22,10 @@ public class StudentServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         out.println("<html>");
         out.println("<head>");
-        out.println("<title>Student Dashboard</title>");
+        out.println("<title>Student Profile</title>");
         out.println("</head>");
         out.println("<body>");
-        out.println("<h1>This will be the student dashboard!</h1>");
+        out.println("<h1>This could be the student profile!</h1>");
         out.println("</body>");
         out.println("</html>");
     }
